@@ -1,12 +1,18 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const mongoose = require('mongoose')
+const { Schema } = mongoose
+
+const password = process.argv[2]
+
+const url = `mongodb+srv://Luis:${password}@clusterfshelsinki.hwwy2x9.mongodb.net/?retryWrites=true&w=majority&appName=ClusterFSHelsinki`
 
 const app = express()
 app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
-morgan.token('reqInfo', function (req) { return JSON.stringify(req.body)})
+morgan.token('reqInfo', function (req) { return JSON.stringify(req.body) })
 app.use(morgan(function (tokens, req, res) {
     return [
         tokens.method(req, res),
@@ -18,6 +24,14 @@ app.use(morgan(function (tokens, req, res) {
     ].join(' ')
 }))
 
+mongoose.connect(url)
+
+const contactSchema = new Schema({
+    'name': String,
+    'number': String
+})
+
+const Contact = mongoose.model('Contact', contactSchema)
 
 let agenda = [
     {
@@ -58,7 +72,7 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-    response.json(agenda)
+
 })
 
 app.get('/info', (request, response) => {
